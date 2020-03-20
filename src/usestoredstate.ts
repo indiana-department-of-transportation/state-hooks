@@ -6,6 +6,7 @@
  *
  * @author jasmith79@gmail.com
  * @license MIT
+ * @copyright INDOT, 2020
  */
 
 import React, { useState, useEffect } from 'react';
@@ -47,13 +48,13 @@ export const isThenable = (x: any): boolean => x && typeof x.then === 'function'
  * comprise a monad, it's close enough for our purposes here. This function will
  * serve the role of a monadic bind to facilitate composition of the storage setters.
  *
- * @param fn The function to lift a function into the Promise not-quite-a-monad.
+ * @param fn The function to lift a function or method into the Promise not-quite-a-monad.
  * @returns A Promise of the value returned from the passed-in function.
  */
 export const bindP = <T, U>(fn: (x: T) => U | Promise<U>): ((y: Promise<T>) => Promise<U>) => {
-  return async (p: Promise<T>) => {
+  return async function(this: any, p: Promise<T>) {
     const value = await p;
-    return fn(value);
+    return fn.call(this, value);
   };
 };
 
@@ -67,7 +68,7 @@ export const bindP = <T, U>(fn: (x: T) => U | Promise<U>): ((y: Promise<T>) => P
  * @returns The value being stored in localStorage.
  */
 const getLocal = <T>(url: string): T => {
-  let cachedValue: unknown = globalThis.localStorage.getItem(url);
+  let cachedValue: unknown = localStorage.getItem(url);
   try {
     cachedValue = JSON.parse(cachedValue as string);
   } catch (err) {
@@ -91,13 +92,13 @@ export const getFromLocalStorage: IGetStoredStateFn = getLocal;
  */
 const syncLocal = <T>(url: string, value: T): T => {
   const valueToCache = typeof value === 'string' ? value : JSON.stringify(value);
-  globalThis.localStorage.setItem(url, valueToCache);
+  localStorage.setItem(url, valueToCache);
   return value;
 };
 
 export const syncToLocalStorage: IStoreStateFn = syncLocal;
 
-const setServerState = async <T>(url: string, state: T, headers: Headers, responseHandler: (r: Response) => void): Promise<T> => {
+export const setServerState = async <T>(url: string, state: T, headers: Headers, responseHandler: (r: Response) => void): Promise<T> => {
   const params: {
     body: string,
     method: 'POST',
@@ -119,7 +120,7 @@ const setServerState = async <T>(url: string, state: T, headers: Headers, respon
   return state;
 };
 
-const getServerState = async <T>(url: string, headers: Headers, responseHandler: (r: Response) => void): Promise<T> => {
+export const getServerState = async <T>(url: string, headers: Headers, responseHandler: (r: Response) => void): Promise<T> => {
   const params: {
     method: 'GET',
     headers?: Headers,
@@ -168,18 +169,20 @@ export const useSyncedState = <T>(
     if (isThenable(cachedValue)) {
       (cachedValue as Promise<T>).then(value => updateState(value));
     } else {
-      updateState(cachedValue as T);
+      if (cachedValue != null) updateState(cachedValue as T);
     }
   }, [getFromStore, updateState]);
 
   useEffect(() => {
     syncToStore(url, state);
-  }, [state]);
+  });
+
+  console.log("RETURNING STATE: " + JSON.stringify(state));
   return [state as T, updateState];
 };
 
 // export const useLocalState = <T>(initialState: T, url: string): [T, (x: T) => void] => {
-//   let cachedValue = globalThis.localStorage.getItem(url);
+//   let cachedValue = localStorage.getItem(url);
 //   try {
 //     cachedValue = JSON.parse(cachedValue as string);
 //   } catch (err) {
@@ -190,7 +193,7 @@ export const useSyncedState = <T>(
 //   const [state, updateState] = useState(cachedValue || init);
 //   useEffect(() => {
 //     const valueToCache = typeof state === 'string' ? state: JSON.stringify(state);
-//     globalThis.localStorage.setItem(url, valueToCache);
+//     localStorage.setItem(url, valueToCache);
 //   }, [state]);
 
 //   return [state as T, updateState];
