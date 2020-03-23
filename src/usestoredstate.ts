@@ -31,12 +31,22 @@ export interface IGetStoredStateFn {
   <T>(url: string): T | Promise<T>
 }
 
+/**
+ * @interface ISetRemoteArgs
+ * 
+ * Arguments to set state to a server.
+ */
 interface ISetRemoteArgs<T> {
   state: T,
   url: string,
   headers?: Headers,
 }
 
+/**
+ * @interface IUseRemoteArgs
+ * 
+ * Arguments to the hook for syncing state with a server.
+ */
 interface IUseRemoteArgs<T> {
   initialState: T,
   url: string,
@@ -44,11 +54,21 @@ interface IUseRemoteArgs<T> {
   onError?: (err: Error) => void,
 }
 
+/**
+ * @interface IGetRemoteArgs
+ * 
+ * Arguments for fetching state from a server.
+ */
 interface IGetRemoteArgs {
   url: string,
   headers?: Headers,
 }
 
+/**
+ * @interface IUseSyncedStateArgs
+ * 
+ * Arguments for the main hook useSyncedState.
+ */
 interface IUseSyncedStateArgs<T> {
   initialState: T,
   url: string,
