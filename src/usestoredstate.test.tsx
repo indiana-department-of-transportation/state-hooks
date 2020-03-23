@@ -80,7 +80,7 @@ describe('bindP', () => {
 describe('useLocalState', () => {
   it('should store state updates in localStorage', async () => {
     const init = { hi: 5 };
-    const { result } = renderHook(() => useLocalState(init, '/foo/bar'));
+    const { result } = renderHook(() => useLocalState('/foo/bar', init));
     expect(globalThis.localStorage.getItem).toHaveBeenCalledWith('/foo/bar');
     const [state, updateState] = result.current;
     expect(state).toEqual(init);

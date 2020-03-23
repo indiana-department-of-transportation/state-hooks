@@ -301,7 +301,7 @@ export const useSyncedState = <T>({
  * @param url The URL for the stored value.  Can be any string but should
  * *uniquely* represent the resource.
  */
-export const useLocalState = <T>(initialState: T, url: string): [T, (x: T) => void] => {
+export const useLocalState = <T>(url: string, initialState: T): [T, (x: T) => void] => {
   return useSyncedState<T>({
     initialState,
     url,
