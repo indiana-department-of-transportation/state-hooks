@@ -9,7 +9,7 @@
  * @copyright INDOT, 2020
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 /**
  * @interface IStoreStateFn
@@ -31,15 +31,31 @@ export interface IGetStoredStateFn {
   <T>(url: string): T | Promise<T>
 }
 
-/**
- * @description isThenable
- * 
- * Duck-types the passed in value as Promise-like.
- *
- * @param x The value to check for thenability.
- * @returns True for Promise-like objects, false for everything else.
- */
-export const isThenable = (x: any): boolean => x && typeof x.then === 'function';
+interface ISetRemoteArgs<T> {
+  state: T,
+  url: string,
+  headers?: Headers,
+}
+
+interface IUseRemoteArgs<T> {
+  initialState: T,
+  url: string,
+  headers?: Headers,
+  onError?: (err: Error) => void,
+}
+
+interface IGetRemoteArgs {
+  url: string,
+  headers?: Headers,
+}
+
+interface IUseSyncedStateArgs<T> {
+  initialState: T,
+  url: string,
+  getFromStore: IGetStoredStateFn,
+  syncToStore: IStoreStateFn,
+  onError?: (err: Error) => void,
+}
 
 /**
  * @description bindP
@@ -98,7 +114,11 @@ const syncLocal = <T>(url: string, value: T): T => {
 
 export const syncToLocalStorage: IStoreStateFn = syncLocal;
 
-export const setServerState = async <T>(url: string, state: T, headers: Headers, responseHandler: (r: Response) => void): Promise<T> => {
+export const setServerState = async <T>({
+  url,
+  state,
+  headers,
+}: ISetRemoteArgs<T>): Promise<T> => {
   const params: {
     body: string,
     method: 'POST',
@@ -111,16 +131,22 @@ export const setServerState = async <T>(url: string, state: T, headers: Headers,
   if (headers) {
     params.headers = headers;
   }
+  console.log("CALLING FETCH POST " + url + " " + params.body);
+  const resp = await fetch(url, params);
 
-  const response = await fetch(url, params);
-  if (responseHandler) {
-    responseHandler(response);
+  // There really isn't a good way here to plumb an unsuccessful POST
+  // out to the user except to throw an error and let them catch it.
+  if (resp.status < 200 || resp.status >= 400) {
+    throw new Error(`POST for '${url}' returned a ${resp.status} response.`);
   }
 
   return state;
 };
 
-export const getServerState = async <T>(url: string, headers: Headers, responseHandler: (r: Response) => void): Promise<T> => {
+export const getServerState = async <T>({
+  url,
+  headers,
+}: IGetRemoteArgs): Promise<T> => {
   const params: {
     method: 'GET',
     headers?: Headers,
@@ -131,10 +157,13 @@ export const getServerState = async <T>(url: string, headers: Headers, responseH
   if (headers) {
     params.headers = headers;
   }
-
+  console.log("CALLING FETCH GET " + url);
   const response = await fetch(url, params);
-  if (responseHandler) {
-    responseHandler(response);
+
+  // There really isn't a good way here to plumb an unsuccessful fetch
+  // out to the user except to throw an error and let them catch it.
+  if (response.status < 200 || response.status >= 400) {
+    throw new Error(`GET for '${url}' returned a ${response.status} response.`);
   }
 
   try {
@@ -157,47 +186,71 @@ export const getServerState = async <T>(url: string, headers: Headers, responseH
  * @param getFromStore Function to retrieve a value from the data store.
  * @param syncToStore Function to save state changes to the data store.
  */
-export const useSyncedState = <T>(
-  initialState: T,
-  url: string,
-  getFromStore: IGetStoredStateFn,
-  syncToStore: IStoreStateFn,
-): [T, (x: T) => void] => {
+export const useSyncedState = <T>({
+  initialState,
+  url,
+  getFromStore,
+  syncToStore,
+  onError = console.error,
+}: IUseSyncedStateArgs<T>): [T, (x: T) => void] => {
+  const shouldSet = useRef(false);
   const [state, updateState] = useState(initialState);
-  useEffect(() => {
-    const cachedValue = getFromStore(url);
-    if (isThenable(cachedValue)) {
-      (cachedValue as Promise<T>).then(value => updateState(value));
-    } else {
-      if (cachedValue != null) updateState(cachedValue as T);
-    }
-  }, [getFromStore, updateState]);
+  const setState = (state: T) => {
+    shouldSet.current = true;
+    updateState(state);
+  };
 
   useEffect(() => {
-    syncToStore(url, state);
-  });
+    const fn = async () => {
+      console.log("Fetching from store...");
+      let cachedValue;
+      try {
+        cachedValue = await getFromStore(url);
+      } catch (err) {
+        onError(err);
+        return;
+      }
+
+      if (cachedValue != null) {
+        updateState(cachedValue);
+      } else {
+        console.log("Cached value null, syncing to store");
+        try {
+          syncToStore(url, state);
+        } catch (err) {
+          onError(err);
+        }
+      }
+    };
+
+    fn();
+  }, []);
+
+  useEffect(() => {
+    const fn = async () => {
+      // There are two cases where we don't want to sync back
+      // to the store: one is where we just got the value from the
+      // store and the other is that we don't want to sync the
+      // default value provided to the hook back. We only want to
+      // sync calls made from outside the hook, hence the flag that
+      // the setter toggles.
+      if (shouldSet.current) {
+        shouldSet.current = false;
+        console.log("Syncing to store...")
+        try {
+          await syncToStore(url, state);
+        } catch (err) {
+          onError(err);
+        }
+      }
+    };
+
+    fn();
+  }, [url, state, syncToStore]);
 
   console.log("RETURNING STATE: " + JSON.stringify(state));
-  return [state as T, updateState];
+  return [state as T, setState];
 };
-
-// export const useLocalState = <T>(initialState: T, url: string): [T, (x: T) => void] => {
-//   let cachedValue = localStorage.getItem(url);
-//   try {
-//     cachedValue = JSON.parse(cachedValue as string);
-//   } catch (err) {
-//     // no-op
-//   }
-
-//   const init = cachedValue == null ? initialState : cachedValue;
-//   const [state, updateState] = useState(cachedValue || init);
-//   useEffect(() => {
-//     const valueToCache = typeof state === 'string' ? state: JSON.stringify(state);
-//     localStorage.setItem(url, valueToCache);
-//   }, [state]);
-
-//   return [state as T, updateState];
-// };
 
 /**
  * @description useLocalState
@@ -210,29 +263,38 @@ export const useSyncedState = <T>(
  * *uniquely* represent the resource.
  */
 export const useLocalState = <T>(initialState: T, url: string): [T, (x: T) => void] => {
-  return useSyncedState<T>(
+  return useSyncedState<T>({
     initialState,
     url,
-    getFromLocalStorage,
-    syncToLocalStorage,
-  );
+    getFromStore: getFromLocalStorage,
+    syncToStore: syncToLocalStorage,
+  });
 };
 
-export const useRemoteState = <T>(initialState: T, url: string, headers: Headers, responseHandler: (r: Response) => void): [T, (x: T) => void] => {
-  const getRemote: IGetStoredStateFn = (url: string) => getServerState(url, headers, responseHandler);
-  const setRemoteFn = <U>(url: string, state: U) => setServerState<U>(
+export const useRemoteState = <T>({
+  url,
+  initialState,
+  headers,
+  onError,
+}: IUseRemoteArgs<T>): [T, (x: T) => void] => {
+  const getRemote: IGetStoredStateFn = (url: string) => getServerState({
+    url,
+    headers,
+  });
+
+  const setRemoteFn = <U>(url: string, state: U) => setServerState<U>({
     url,
     state,
     headers,
-    responseHandler,
-  );
+  });
 
   const setRemote: IStoreStateFn = setRemoteFn;
 
-  return useSyncedState<T>(
+  return useSyncedState<T>({
     initialState,
     url,
-    getRemote,
-    setRemote,
-  );
+    getFromStore: getRemote,
+    syncToStore: setRemote,
+    onError,
+  });
 };
