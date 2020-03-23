@@ -114,6 +114,15 @@ const syncLocal = <T>(url: string, value: T): T => {
 
 export const syncToLocalStorage: IStoreStateFn = syncLocal;
 
+/**
+ * @description POSTs state to a url.
+ *
+ * @param [args] The arguments object.
+ * @param args.url The url to POST to.
+ * @param args.state The state to POST.
+ * @param args.headers Optional headers.
+ * @returns A promise of the state.
+ */
 export const setServerState = async <T>({
   url,
   state,
@@ -143,6 +152,14 @@ export const setServerState = async <T>({
   return state;
 };
 
+/**
+ * @description Fetches state from a url.
+ *
+ * @param [args] The arguments object.
+ * @param args.url The url to fetch.
+ * @param args.headers Optional headers.
+ * @returns A promise of the state.
+ */
 export const getServerState = async <T>({
   url,
   headers,
@@ -180,11 +197,13 @@ export const getServerState = async <T>({
  * Custom React hook to sync data to/from a data store. Supports both sync and
  * async storage.
  *
- * @param initialState The initial value. Should generally be a default that
+ * @param [args] The parameter object.
+ * @param args.initialState The initial value. Should generally be a default that
  * is overridden by the stored value if present.
- * @param url The URL for the stored value.
- * @param getFromStore Function to retrieve a value from the data store.
- * @param syncToStore Function to save state changes to the data store.
+ * @param args.url The URL for the stored value.
+ * @param args.getFromStore Function to retrieve a value from the data store.
+ * @param args.syncToStore Function to save state changes to the data store.
+ * @returns A tuple with the current state and a setter.
  */
 export const useSyncedState = <T>({
   initialState,
@@ -271,6 +290,17 @@ export const useLocalState = <T>(initialState: T, url: string): [T, (x: T) => vo
   });
 };
 
+/**
+ * @description Syncs the passed-in state with a remote server. Follows the
+ * semantics of the setter returned from useState.
+ *
+ * @param [args] The parameter object.
+ * @param args.url The url for the data.
+ * @param args.initialState The default value for the data.
+ * @param args.headers The optional headers object.
+ * @param args.onError The optional error handler, defaults to console.error.
+ * @returns A tuple with the current state and a setter.
+ */
 export const useRemoteState = <T>({
   url,
   initialState,
