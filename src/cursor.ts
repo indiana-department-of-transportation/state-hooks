@@ -1,4 +1,4 @@
-import { useState, useReducer, useEffect } from "react";
+import { useState, useMemo } from "react";
 
 export const isPrimitiveValue = (x: any): boolean => {
   const type = typeof x;
@@ -16,9 +16,9 @@ export const deepClone = <T>(obj: T, ..._args: any[]): T => {
   // if (Array.isArray(obj)) return obj.map(deepClone);
   return Object.entries(obj).reduce((acc: { [k: string]: any }, [key, value]) => {
     // For promise-like, assume immutability
-    if ( isPrimitiveValue(value) || isThenable(value)) {
+    if (isPrimitiveValue(value) || isThenable(value)) {
       acc[key] = value;
-    // Defer to object's clone method if present.
+      // Defer to object's clone method if present.
     } else if (typeof value.clone === 'function') {
       acc[key] = value.clone();
     } else if (Array.isArray(value)) {
@@ -36,61 +36,17 @@ export const deepClone = <T>(obj: T, ..._args: any[]): T => {
   }, {}) as T;
 };
 
-// const useLens = <T, K extends keyof T>(getter: (k: K) => T[K], setter: (k: K, v: T[K]) => void) => {
-
-// };
-
-// export const useSubState = <T>(state: T, setState: (update: T) => void) => {
-//   return <K extends keyof T>(key: K): [T[K], (x: T[K]) => T] => {
-//     const [subState, setSubState] = useState(state[key]);
-//     const setter = (value: T[K]) => {
-//       const newState = deepClone<T>(state);
-//       newState[key] = value;
-//       setState(newState);
-//       setSubState(value);
-//       return newState;
-//     };
-//     return [subState, setter];
-//   }
-// };
-
-interface IReducerAction<T> {
-  value: T,
-  type: string
-}
-
-// Type of the reducer given to useReducer
-type Reducer<S, A> = (prevState: S, action: A) => S
-
-// Same as the type of the dispatch function returned from useReducer.
-type Dispatch<A> = (action: A) => void
-
-const reducer = <T, K extends keyof T>(prevState: T, action: IReducerAction<Partial<T>>) => {
-  const newState = deepClone(prevState);
-  return Object.assign(newState, action.value);
-};
-
 export const useSubState = <T, K extends keyof T>(state: T, setState: (update: T) => void) => {
-  const [view, dispatch] = useReducer(reducer, state);
+  const useCursor = <K extends keyof T>(key: K): [T[K], (update: T[K]) => void] => {
+    const [cursorState, updateCursor] = useState(state[key]);
+    useMemo(() => {
+      const value = { [key]: cursorState };
+      const clone = deepClone(state);
+      setState(Object.assign(clone, value));
+    }, [cursorState]);
 
-  useEffect(() => {
-    setState(view as T);
-  }, [view]);
-
-  const f = <K extends keyof T>(key: K): [T[K], (update: T[K]) => {
-    [x: string]: T[K];
-  }] => {
-    const setter = (update: T[K]) => {
-      const value = { [key]: update };
-      dispatch({
-        type: 'update',
-        value,
-      });
-
-      return value;
-    };
-    return [state[key], setter];
+    return [cursorState, updateCursor];
   };
 
-  return f;
+  return useCursor;
 };

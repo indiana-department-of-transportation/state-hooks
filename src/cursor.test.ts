@@ -7,7 +7,7 @@ import { renderHook, act } from '@testing-library/react-hooks';
 import {
   deepClone,
   useSubState,
-} from './lens';
+} from './cursor';
 
 describe('testing', () => {
   it('should work', () => {
