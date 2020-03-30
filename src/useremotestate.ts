@@ -63,7 +63,6 @@ export const setServerState = async <T>({
   if (headers) {
     params.headers = headers;
   }
-  console.log("CALLING FETCH POST " + url + " " + params.body);
   const resp = await fetch(url, params);
 
   // There really isn't a good way here to plumb an unsuccessful POST
@@ -97,7 +96,7 @@ export const getServerState = async <T>({
   if (headers) {
     params.headers = headers;
   }
-  console.log("CALLING FETCH GET " + url);
+
   const response = await fetch(url, params);
 
   // There really isn't a good way here to plumb an unsuccessful fetch

@@ -1,5 +1,3 @@
-import 'jsdom-global/register';
-import '@testing-library/jest-dom/extend-expect';
 
 import fetchPonyfill from 'fetch-ponyfill';
 import { renderHook, act } from '@testing-library/react-hooks';

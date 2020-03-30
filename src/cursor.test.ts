@@ -1,5 +1,3 @@
-import 'jsdom-global/register';
-import '@testing-library/jest-dom/extend-expect';
 
 import { useState } from 'react';
 import { renderHook, act } from '@testing-library/react-hooks';
@@ -35,12 +33,10 @@ describe('testing', () => {
     const [hi, setHi] = result3.current;
     expect(hi).toBe(5);
     act(() => {
-      console.log("setting");
       setHi(4);
     });
 
     await new Promise(res => setTimeout(res, 0));
-    console.log("getting");
     expect(result1.current[0]).toEqual({ hi: 4 });
     expect(result3.current[0]).toBe(4);
   });

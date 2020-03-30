@@ -74,7 +74,6 @@ export const useSyncedState = <T>({
 
   useEffect(() => {
     const fn = async () => {
-      console.log("Fetching from store...");
       let cachedValue;
       try {
         cachedValue = await getFromStore(url);
@@ -86,7 +85,6 @@ export const useSyncedState = <T>({
       if (cachedValue != null) {
         updateState(cachedValue);
       } else {
-        console.log("Cached value null, syncing to store");
         try {
           syncToStore(url, state);
         } catch (err) {
@@ -108,7 +106,6 @@ export const useSyncedState = <T>({
       // the setter toggles.
       if (shouldSet.current) {
         shouldSet.current = false;
-        console.log("Syncing to store...")
         try {
           await syncToStore(url, state);
         } catch (err) {
@@ -120,7 +117,6 @@ export const useSyncedState = <T>({
     fn();
   }, [url, state, syncToStore]);
 
-  console.log("RETURNING STATE: " + JSON.stringify(state));
   return [state as T, setState];
 };
 
