@@ -1,5 +1,5 @@
 {
-  "name": "@indot/usestoredstate",
+  "name": "@indot/state-hooks",
   "version": "0.0.1",
   "description": "Custom React hook to sync data to/from a data store. Supports both sync and async storage.",
   "main": "dist/index.js",
@@ -16,7 +16,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/indiana-department-of-transportation/usestoredstate.git"
+    "url": "git+https://github.com/indiana-department-of-transportation/state-hooks.git"
   },
   "keywords": [
     "react",
@@ -26,9 +26,9 @@
   "author": "jarsmith",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/indiana-department-of-transportation/usestoredstate/issues"
+    "url": "https://github.com/indiana-department-of-transportation/state-hooks/issues"
   },
-  "homepage": "https://github.com/indiana-department-of-transportation/usestoredstate#readme",
+  "homepage": "https://github.com/indiana-department-of-transportation/state-hooks#readme",
   "dependencies": {
     "@jasmith79/ts-utils": "^0.1.0",
     "@testing-library/react": "^10.0.1",
