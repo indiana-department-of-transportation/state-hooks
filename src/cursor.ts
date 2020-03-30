@@ -36,7 +36,7 @@ export const deepClone = <T>(obj: T, ..._args: any[]): T => {
   }, {}) as T;
 };
 
-export const useSubState = <T, K extends keyof T>(state: T, setState: (update: T) => void) => {
+export const usePartialState = <T, K extends keyof T>(state: T, setState: (update: T) => void) => {
   const useCursor = <K extends keyof T>(key: K): [T[K], (update: T[K]) => void] => {
     const [cursorState, updateCursor] = useState(state[key]);
     useMemo(() => {
@@ -50,3 +50,5 @@ export const useSubState = <T, K extends keyof T>(state: T, setState: (update: T
 
   return useCursor;
 };
+
+export default usePartialState;

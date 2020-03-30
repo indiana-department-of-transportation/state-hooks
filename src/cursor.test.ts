@@ -6,7 +6,7 @@ import { renderHook, act } from '@testing-library/react-hooks';
 
 import {
   deepClone,
-  useSubState,
+  usePartialState,
 } from './cursor';
 
 describe('testing', () => {
@@ -29,7 +29,7 @@ describe('testing', () => {
     const init = { hi: 5 };
     const { result: result1 } = renderHook(() => useState(init));
     const [state, setState] = result1.current;
-    const { result: result2 } = renderHook(() => useSubState(state, setState));
+    const { result: result2 } = renderHook(() => usePartialState(state, setState));
     const useCursor = result2.current;
     const { result: result3 } = renderHook(() => useCursor('hi'));
     const [hi, setHi] = result3.current;
