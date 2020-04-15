@@ -1,6 +1,24 @@
-import { IGetStoredStateFn, IStoreStateFn } from './usesyncedstate';
-export declare const getFromLocalStorage: IGetStoredStateFn;
-export declare const syncToLocalStorage: IStoreStateFn;
+/**
+ * @description getLocal
+ *
+ * Gets a cached value from localStorage.
+ *
+ * @param url The URL for the cached resource. Can be any string but should
+ * *uniquely* represent the resource.
+ * @returns The value being stored in localStorage.
+ */
+export declare const getFromLocalStorage: <T>(url: string) => T;
+/**
+ * @description syncLocal
+ *
+ * Stores a value in localStorage with the specified URL as the key.
+ *
+ * @param url The URL for the resource being cached. Can be any string but should
+ * *uniquely* represent the resource.
+ * @param value The value to store. Non-string values will be JSON.stringified.
+ * @returns The value being stored.
+ */
+export declare const syncToLocalStorage: <T>(url: string, value: T) => T;
 /**
  * @description useLocalState
  *

@@ -10,7 +10,7 @@ const usesyncedstate_1 = require("./usesyncedstate");
  * *uniquely* represent the resource.
  * @returns The value being stored in localStorage.
  */
-const getLocal = (url) => {
+exports.getFromLocalStorage = (url) => {
     let cachedValue = localStorage.getItem(url);
     try {
         cachedValue = JSON.parse(cachedValue);
@@ -20,7 +20,6 @@ const getLocal = (url) => {
     }
     return cachedValue;
 };
-exports.getFromLocalStorage = getLocal;
 /**
  * @description syncLocal
  *
@@ -31,12 +30,11 @@ exports.getFromLocalStorage = getLocal;
  * @param value The value to store. Non-string values will be JSON.stringified.
  * @returns The value being stored.
  */
-const syncLocal = (url, value) => {
+exports.syncToLocalStorage = (url, value) => {
     const valueToCache = typeof value === 'string' ? value : JSON.stringify(value);
     localStorage.setItem(url, valueToCache);
     return value;
 };
-exports.syncToLocalStorage = syncLocal;
 /**
  * @description useLocalState
  *

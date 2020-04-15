@@ -1,3 +1,5 @@
+import { useCallback } from 'react';
+
 import {
   useSyncedState,
   IGetStoredStateFn,
@@ -130,18 +132,59 @@ export const useRemoteState = <T>({
   headers,
   onError,
 }: IUseRemoteArgs<T>): [T, (x: T) => void] => {
-  const getRemote: IGetStoredStateFn = (url: string) => getServerState({
-    url,
-    headers,
-  });
+  const getRemote: IGetStoredStateFn<T> = useCallback(async (url: string): Promise<T> => {
+    const params: {
+      method: 'GET',
+      headers?: Headers,
+    } = {
+      method: 'GET',
+    };
 
-  const setRemoteFn = <U>(url: string, state: U) => setServerState<U>({
-    url,
-    state,
-    headers,
-  });
+    if (headers) {
+      params.headers = headers;
+    }
 
-  const setRemote: IStoreStateFn = setRemoteFn;
+    const response = await fetch(url, params);
+
+    // There really isn't a good way here to plumb an unsuccessful fetch
+    // out to the user except to throw an error and let them catch it.
+    if (response.status < 200 || response.status >= 400) {
+      throw new Error(`GET for '${url}' returned a ${response.status} response.`);
+    }
+
+    try {
+      return response.json();
+    } catch (_err) {
+      const text: unknown = await response.text();
+      return (text as T);
+    }
+  }, [headers]);
+
+  const setRemote = useCallback(async (url: string, state: T): Promise<T> => {
+    const params: {
+      body: string,
+      method: 'POST',
+      headers?: Headers,
+    } = {
+      body: typeof state === 'string' ? state : JSON.stringify(state),
+      method: 'POST',
+    };
+
+    if (headers) {
+      params.headers = headers;
+    }
+    const resp = await fetch(url, params);
+
+    // There really isn't a good way here to plumb an unsuccessful POST
+    // out to the user except to throw an error and let them catch it.
+    if (resp.status < 200 || resp.status >= 400) {
+      throw new Error(`POST for '${url}' returned a ${resp.status} response.`);
+    }
+
+    return state;
+  }, [headers]);
+
+  // const setRemote: IStoreStateFn = setRemoteFn;
 
   return useSyncedState<T>({
     initialState,
