@@ -1,9 +1,9 @@
 
 import { useState } from 'react';
 import { renderHook, act } from '@testing-library/react-hooks';
+import { deepClone } from '@jasmith79/ts-utils';
 
 import {
-  deepClone,
   usePartialState,
 } from './cursor';
 

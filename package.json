@@ -52,5 +52,8 @@
   "peerDependencies": {
     "react": "^16.13.1",
     "react-dom": "^16.13.1"
+  },
+  "dependencies": {
+    "@jasmith79/ts-utils": "^0.6.0"
   }
 }

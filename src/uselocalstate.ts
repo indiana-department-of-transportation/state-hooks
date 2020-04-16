@@ -1,4 +1,12 @@
-
+/**
+ * uselocalstate.js
+ *
+ * @description State hook that caches in localStorage.
+ *
+ * @author jarsmith@indot.in.gov
+ * @license MIT
+ * @copyright INDOT, 2020
+ */
 import { useSyncedState } from './usesyncedstate';
 
 /**

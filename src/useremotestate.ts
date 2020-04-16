@@ -1,3 +1,12 @@
+/**
+ * useremotestate.js
+ *
+ * @description Synchronizises state changes with a remote server.
+ *
+ * @author jarsmith@indot.in.gov
+ * @license MIT
+ * @copyright INDOT, 2020
+ */
 import { useCallback } from 'react';
 
 import {

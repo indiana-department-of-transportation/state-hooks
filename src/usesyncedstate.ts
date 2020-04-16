@@ -3,12 +3,14 @@
  *
  * @description Custom React hook for syncing state with a data store.
  * Supports both synchronous and asynchronous data storage.
+ * 
+ * NOTE: No tests for this, as it's functionality is thoroughly tested
+ * by the derivative hooks in this repo.
  *
  * @author jarsmith@indot.in.gov
  * @license MIT
  * @copyright INDOT, 2020
  */
-
 import { useEffect, useState, useRef } from 'react';
 
 /**
