@@ -5,7 +5,7 @@
  * @description Custom React hook for syncing state with a data store.
  * Supports both synchronous and asynchronous data storage.
  *
- * @author jasmith79@gmail.com
+ * @author jarsmith@indot.in.gov
  * @license MIT
  * @copyright INDOT, 2020
  */
