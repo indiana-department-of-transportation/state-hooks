@@ -1,5 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+/**
+ * uselocalstate.js
+ *
+ * @description State hook that caches in localStorage.
+ *
+ * @author jarsmith@indot.in.gov
+ * @license MIT
+ * @copyright INDOT, 2020
+ */
 const usesyncedstate_1 = require("./usesyncedstate");
 /**
  * @description getLocal
@@ -13,7 +22,7 @@ const usesyncedstate_1 = require("./usesyncedstate");
 exports.getFromLocalStorage = (url) => {
     let cachedValue = localStorage.getItem(url);
     try {
-        cachedValue = JSON.parse(cachedValue);
+        return JSON.parse(cachedValue);
     }
     catch (err) {
         // no-op

@@ -1,14 +1,4 @@
 /**
- * usesyncedstate.js
- *
- * @description Custom React hook for syncing state with a data store.
- * Supports both synchronous and asynchronous data storage.
- *
- * @author jarsmith@indot.in.gov
- * @license MIT
- * @copyright INDOT, 2020
- */
-/**
  * @interface IStoreStateFn
  *
  * NOTE: The interface is defined with the return value being the state that was

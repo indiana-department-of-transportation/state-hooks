@@ -7,14 +7,6 @@ const fetch_ponyfill_1 = __importDefault(require("fetch-ponyfill"));
 const react_hooks_1 = require("@testing-library/react-hooks");
 const useremotestate_1 = __importDefault(require("./useremotestate"));
 const { Request, Headers } = fetch_ponyfill_1.default();
-const localStorageMockFactory = () => {
-    const store = {};
-    return {
-        getItem: jest.fn(),
-        setItem: jest.fn(),
-        clear: jest.fn(),
-    };
-};
 globalThis.Request = Request;
 globalThis.fetch = jest.fn();
 const fakeResponseFactory = async (returnValue, status = 200) => ({

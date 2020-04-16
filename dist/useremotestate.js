@@ -1,5 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+/**
+ * useremotestate.js
+ *
+ * @description Synchronizises state changes with a remote server.
+ *
+ * @author jarsmith@indot.in.gov
+ * @license MIT
+ * @copyright INDOT, 2020
+ */
 const react_1 = require("react");
 const usesyncedstate_1 = require("./usesyncedstate");
 /**
@@ -78,6 +87,7 @@ exports.useRemoteState = ({ url, initialState, headers, onError, }) => {
         const response = await fetch(url, params);
         // There really isn't a good way here to plumb an unsuccessful fetch
         // out to the user except to throw an error and let them catch it.
+        // Always wear an ErrorBoundaries kids!
         if (response.status < 200 || response.status >= 400) {
             throw new Error(`GET for '${url}' returned a ${response.status} response.`);
         }

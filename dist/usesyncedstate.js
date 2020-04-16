@@ -1,15 +1,18 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * usesyncedstate.js
  *
  * @description Custom React hook for syncing state with a data store.
  * Supports both synchronous and asynchronous data storage.
  *
+ * NOTE: No tests for this, as it's functionality is thoroughly tested
+ * by the derivative hooks in this repo.
+ *
  * @author jarsmith@indot.in.gov
  * @license MIT
  * @copyright INDOT, 2020
  */
-Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = require("react");
 /**
  * @description useSyncedState

@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = require("react");
 const react_hooks_1 = require("@testing-library/react-hooks");
+const ts_utils_1 = require("@jasmith79/ts-utils");
 const cursor_1 = require("./cursor");
 describe('testing', () => {
     it('should work', () => {
@@ -11,7 +12,7 @@ describe('testing', () => {
                 'c'
             ]
         };
-        const bar = cursor_1.deepClone(foo);
+        const bar = ts_utils_1.deepClone(foo);
         expect(foo).toEqual(bar);
         expect(foo === bar).toBe(false);
         foo.b = ['c', 'd'];
