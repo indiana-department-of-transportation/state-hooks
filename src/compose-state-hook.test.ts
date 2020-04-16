@@ -99,7 +99,6 @@ describe('useComposedState', () => {
     });
 
     await new Promise(res => setTimeout(res, 0));
-    console.log(JSON.stringify(result.current.state));
     expect(result.current.state.hi).toBe(4);
     expect(result.current.hi).toBe(4);
     expect(result.current.alsoHi).toBe(4);

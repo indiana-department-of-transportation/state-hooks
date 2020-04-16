@@ -10,8 +10,6 @@
  */
 
 import { useEffect, useState, useRef } from 'react';
-// import { Nullable } from '@jasmith79/ts-utils';
-// import { Opt } from './t';
 
 /**
  * @interface IStoreStateFn
@@ -67,36 +65,27 @@ export const useSyncedState = <T>({
   syncToStore,
   onError = console.error,
 }: IUseSyncedStateArgs<T>): [T, (x: T) => void] => {
-  console.log('CALLED WITH');
-  console.log(initialState);
   const shouldSet = useRef(false);
   const [state, updateState] = useState(initialState);
   const setState = (state: T) => {
-    console.log('setting state');
-    console.log(state);
     shouldSet.current = true;
     updateState(state);
   };
 
   useEffect(() => {
     const fn = async () => {
-      console.log('ONLY ONCE!!!!!!!!!!!!!!!!!!!!!!!!!');
       let cachedValue;
       try {
-        console.log('abra');
         cachedValue = await getFromStore(url);
-        console.log('cadabra');
       } catch (err) {
         onError(err);
         return;
       }
 
       if (cachedValue != null) {
-        console.log('setting from localStorage');
         updateState(cachedValue);
       } else {
         try {
-          console.log('NO!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
           syncToStore(url, state);
         } catch (err) {
           onError(err);
@@ -116,8 +105,6 @@ export const useSyncedState = <T>({
       // sync calls made from outside the hook, hence the flag that
       // the setter toggles.
       if (shouldSet.current) {
-        console.log('syncing');
-        console.log(state);
         shouldSet.current = false;
         try {
           await syncToStore(url, state);

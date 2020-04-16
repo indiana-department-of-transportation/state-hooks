@@ -1,6 +1,5 @@
-// import { Nullable } from '@jasmith79/ts-utils';
+
 import { useSyncedState } from './usesyncedstate';
-// import { Opt } from './t';
 
 /**
  * @description getLocal
@@ -34,7 +33,6 @@ export const getFromLocalStorage = <T>(url: string): T => {
  */
 export const syncToLocalStorage = <T>(url: string, value: T): T => {
   const valueToCache = typeof value === 'string' ? value : JSON.stringify(value);
-  console.log(`CACHING ${valueToCache} in localStorage`);
   localStorage.setItem(url, valueToCache);
   return value;
 };

@@ -1,11 +1,8 @@
 import { useCallback } from 'react';
-// import { Nullable } from '@jasmith79/ts-utils';
-// import { Opt } from './t';
 
 import {
   useSyncedState,
   IGetStoredStateFn,
-  IStoreStateFn
 } from './usesyncedstate';
 
 /**
@@ -150,6 +147,7 @@ export const useRemoteState = <T>({
 
     // There really isn't a good way here to plumb an unsuccessful fetch
     // out to the user except to throw an error and let them catch it.
+    // Always wear an ErrorBoundaries kids!
     if (response.status < 200 || response.status >= 400) {
       throw new Error(`GET for '${url}' returned a ${response.status} response.`);
     }
