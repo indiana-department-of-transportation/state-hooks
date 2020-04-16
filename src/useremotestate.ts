@@ -1,4 +1,6 @@
 import { useCallback } from 'react';
+// import { Nullable } from '@jasmith79/ts-utils';
+import { Opt } from './t';
 
 import {
   useSyncedState,
@@ -12,7 +14,7 @@ import {
  * Arguments to set state to a server.
  */
 interface ISetRemoteArgs<T> {
-  state: T,
+  state: Opt<T>,
   url: string,
   headers?: Headers,
 }
@@ -23,7 +25,7 @@ interface ISetRemoteArgs<T> {
  * Arguments to the hook for syncing state with a server.
  */
 interface IUseRemoteArgs<T> {
-  initialState: T,
+  initialState: Opt<T>,
   url: string,
   headers?: Headers,
   onError?: (err: Error) => void,
@@ -42,9 +44,9 @@ interface IGetRemoteArgs {
 /**
  * @description POSTs state to a url.
  *
- * @param [args] The arguments object.
- * @param args.url The url to POST to.
- * @param args.state The state to POST.
+ * @param [args] Opt<T>he arguments object.
+ * @param args.url Opt<T>he url to POST to.
+ * @param args.state Opt<T>he state to POST.
  * @param args.headers Optional headers.
  * @returns A promise of the state.
  */
@@ -52,7 +54,7 @@ export const setServerState = async <T>({
   url,
   state,
   headers,
-}: ISetRemoteArgs<T>): Promise<T> => {
+}: ISetRemoteArgs<T>): Promise<Opt<T>> => {
   const params: {
     body: string,
     method: 'POST',
@@ -67,7 +69,7 @@ export const setServerState = async <T>({
   }
   const resp = await fetch(url, params);
 
-  // There really isn't a good way here to plumb an unsuccessful POST
+  // Opt<T>here really isn't a good way here to plumb an unsuccessful POST
   // out to the user except to throw an error and let them catch it.
   if (resp.status < 200 || resp.status >= 400) {
     throw new Error(`POST for '${url}' returned a ${resp.status} response.`);
@@ -79,15 +81,15 @@ export const setServerState = async <T>({
 /**
  * @description Fetches state from a url.
  *
- * @param [args] The arguments object.
- * @param args.url The url to fetch.
+ * @param [args] Opt<T>he arguments object.
+ * @param args.url Opt<T>he url to fetch.
  * @param args.headers Optional headers.
  * @returns A promise of the state.
  */
 export const getServerState = async <T>({
   url,
   headers,
-}: IGetRemoteArgs): Promise<T> => {
+}: IGetRemoteArgs): Promise<Opt<T>> => {
   const params: {
     method: 'GET',
     headers?: Headers,
@@ -101,7 +103,7 @@ export const getServerState = async <T>({
 
   const response = await fetch(url, params);
 
-  // There really isn't a good way here to plumb an unsuccessful fetch
+  // Opt<T>here really isn't a good way here to plumb an unsuccessful fetch
   // out to the user except to throw an error and let them catch it.
   if (response.status < 200 || response.status >= 400) {
     throw new Error(`GET for '${url}' returned a ${response.status} response.`);
@@ -111,7 +113,7 @@ export const getServerState = async <T>({
     return response.json();
   } catch (_err) {
     const text: unknown = await response.text();
-    return (text as T);
+    return (text as Opt<T>);
   }
 };
 
@@ -119,11 +121,11 @@ export const getServerState = async <T>({
  * @description Syncs the passed-in state with a remote server. Follows the
  * semantics of the setter returned from useState.
  *
- * @param [args] The parameter object.
- * @param args.url The url for the data.
- * @param args.initialState The default value for the data.
- * @param args.headers The optional headers object.
- * @param args.onError The optional error handler, defaults to console.error.
+ * @param [args] Opt<T>he parameter object.
+ * @param args.url Opt<T>he url for the data.
+ * @param args.initialState Opt<T>he default value for the data.
+ * @param args.headers Opt<T>he optional headers object.
+ * @param args.onError Opt<T>he optional error handler, defaults to console.error.
  * @returns A tuple with the current state and a setter.
  */
 export const useRemoteState = <T>({
@@ -131,8 +133,8 @@ export const useRemoteState = <T>({
   initialState,
   headers,
   onError,
-}: IUseRemoteArgs<T>): [T, (x: T) => void] => {
-  const getRemote: IGetStoredStateFn<T> = useCallback(async (url: string): Promise<T> => {
+}: IUseRemoteArgs<T>): [Opt<T>, (x: Opt<T>) => void] => {
+  const getRemote: IGetStoredStateFn<T> = useCallback(async (url: string): Promise<Opt<T>> => {
     const params: {
       method: 'GET',
       headers?: Headers,
@@ -146,7 +148,7 @@ export const useRemoteState = <T>({
 
     const response = await fetch(url, params);
 
-    // There really isn't a good way here to plumb an unsuccessful fetch
+    // Opt<T>here really isn't a good way here to plumb an unsuccessful fetch
     // out to the user except to throw an error and let them catch it.
     if (response.status < 200 || response.status >= 400) {
       throw new Error(`GET for '${url}' returned a ${response.status} response.`);
@@ -156,11 +158,11 @@ export const useRemoteState = <T>({
       return response.json();
     } catch (_err) {
       const text: unknown = await response.text();
-      return (text as T);
+      return (text as Opt<T>);
     }
   }, [headers]);
 
-  const setRemote = useCallback(async (url: string, state: T): Promise<T> => {
+  const setRemote = useCallback(async (url: string, state: Opt<T>): Promise<Opt<T>> => {
     const params: {
       body: string,
       method: 'POST',
@@ -175,7 +177,7 @@ export const useRemoteState = <T>({
     }
     const resp = await fetch(url, params);
 
-    // There really isn't a good way here to plumb an unsuccessful POST
+    // Opt<T>here really isn't a good way here to plumb an unsuccessful POST
     // out to the user except to throw an error and let them catch it.
     if (resp.status < 200 || resp.status >= 400) {
       throw new Error(`POST for '${url}' returned a ${resp.status} response.`);

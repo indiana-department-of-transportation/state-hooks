@@ -10,6 +10,8 @@
  */
 
 import { useEffect, useState, useRef } from 'react';
+// import { Nullable } from '@jasmith79/ts-utils';
+import { Opt } from './t';
 
 /**
  * @interface IStoreStateFn
@@ -19,7 +21,7 @@ import { useEffect, useState, useRef } from 'react';
  * setters.
  */
 export interface IStoreStateFn<T> {
-  (url: string, value: T): T | Promise<T>
+  (url: string, value: Opt<T>): Opt<T> | Promise<Opt<T>>
 }
 
 /**
@@ -28,7 +30,7 @@ export interface IStoreStateFn<T> {
  * Getter for a stored state.
  */
 export interface IGetStoredStateFn<T> {
-  (url: string): T | Promise<T>
+  (url: string): Opt<T> | Promise<Opt<T>>
 }
 
 /**
@@ -37,7 +39,7 @@ export interface IGetStoredStateFn<T> {
  * Arguments for the main hook useSyncedState.
  */
 interface IUseSyncedStateArgs<T> {
-  initialState: T,
+  initialState: Opt<T>,
   url: string,
   getFromStore: IGetStoredStateFn<T>,
   syncToStore: IStoreStateFn<T>,
@@ -64,10 +66,14 @@ export const useSyncedState = <T>({
   getFromStore,
   syncToStore,
   onError = console.error,
-}: IUseSyncedStateArgs<T>): [T, (x: T) => void] => {
+}: IUseSyncedStateArgs<T>): [Opt<T>, (x: Opt<T>) => void] => {
+  console.log('CALLED WITH');
+  console.log(initialState);
   const shouldSet = useRef(false);
   const [state, updateState] = useState(initialState);
-  const setState = (state: T) => {
+  const setState = (state: Opt<T>) => {
+    console.log('setting state');
+    console.log(state);
     shouldSet.current = true;
     updateState(state);
   };
@@ -117,7 +123,7 @@ export const useSyncedState = <T>({
     fn();
   }, [url, state, syncToStore]);
 
-  return [state as T, setState];
+  return [state, setState];
 };
 
 export default useSyncedState;

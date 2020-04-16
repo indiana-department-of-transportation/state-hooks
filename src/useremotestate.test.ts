@@ -6,16 +6,6 @@ import useRemoteState from './useremotestate';
 
 const { Request, Headers } = fetchPonyfill();
 
-const localStorageMockFactory = () => {
-  const store: { [key: string]: string } = {};
-
-  return {
-    getItem: jest.fn(),
-    setItem: jest.fn(),
-    clear: jest.fn(),
-  };
-};
-
 globalThis.Request = Request;
 globalThis.fetch = jest.fn();
 
