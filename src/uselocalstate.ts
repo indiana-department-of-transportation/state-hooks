@@ -1,8 +1,4 @@
-import {
-  useSyncedState,
-  IGetStoredStateFn,
-  IStoreStateFn
-} from './usesyncedstate';
+import { useSyncedState } from './usesyncedstate';
 
 /**
  * @description getLocal
@@ -13,7 +9,7 @@ import {
  * *uniquely* represent the resource.
  * @returns The value being stored in localStorage.
  */
-const getLocal = <T>(url: string): T => {
+export const getFromLocalStorage = <T>(url: string): T => {
   let cachedValue: unknown = localStorage.getItem(url);
   try {
     cachedValue = JSON.parse(cachedValue as string);
@@ -23,8 +19,6 @@ const getLocal = <T>(url: string): T => {
 
   return (cachedValue as T);
 };
-
-export const getFromLocalStorage: IGetStoredStateFn = getLocal;
 
 /**
  * @description syncLocal
@@ -36,13 +30,11 @@ export const getFromLocalStorage: IGetStoredStateFn = getLocal;
  * @param value The value to store. Non-string values will be JSON.stringified.
  * @returns The value being stored.
  */
-const syncLocal = <T>(url: string, value: T): T => {
+export const syncToLocalStorage = <T>(url: string, value: T): T => {
   const valueToCache = typeof value === 'string' ? value : JSON.stringify(value);
   localStorage.setItem(url, valueToCache);
   return value;
 };
-
-export const syncToLocalStorage: IStoreStateFn = syncLocal;
 
 /**
  * @description useLocalState

@@ -18,8 +18,8 @@ import { useEffect, useState, useRef } from 'react';
  * stored (or a Promise thereof for async storage) to facilitate composition of
  * setters.
  */
-export interface IStoreStateFn {
-  <T>(url: string, value: T): T | Promise<T>
+export interface IStoreStateFn<T> {
+  (url: string, value: T): T | Promise<T>
 }
 
 /**
@@ -27,8 +27,8 @@ export interface IStoreStateFn {
  * 
  * Getter for a stored state.
  */
-export interface IGetStoredStateFn {
-  <T>(url: string): T | Promise<T>
+export interface IGetStoredStateFn<T> {
+  (url: string): T | Promise<T>
 }
 
 /**
@@ -39,8 +39,8 @@ export interface IGetStoredStateFn {
 interface IUseSyncedStateArgs<T> {
   initialState: T,
   url: string,
-  getFromStore: IGetStoredStateFn,
-  syncToStore: IStoreStateFn,
+  getFromStore: IGetStoredStateFn<T>,
+  syncToStore: IStoreStateFn<T>,
   onError?: (err: Error) => void,
 }
 
