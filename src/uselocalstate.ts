@@ -1,6 +1,6 @@
 // import { Nullable } from '@jasmith79/ts-utils';
 import { useSyncedState } from './usesyncedstate';
-import { Opt } from './t';
+// import { Opt } from './t';
 
 /**
  * @description getLocal
@@ -11,7 +11,7 @@ import { Opt } from './t';
  * *uniquely* represent the resource.
  * @returns The value being stored in localStorage.
  */
-export const getFromLocalStorage = <T>(url: string): Opt<T> => {
+export const getFromLocalStorage = <T>(url: string): T => {
   let cachedValue: unknown = localStorage.getItem(url);
   try {
     return JSON.parse(cachedValue as string);
@@ -32,8 +32,9 @@ export const getFromLocalStorage = <T>(url: string): Opt<T> => {
  * @param value The value to store. Non-string values will be JSON.stringified.
  * @returns The value being stored.
  */
-export const syncToLocalStorage = <T>(url: string, value: Opt<T>): Opt<T> => {
+export const syncToLocalStorage = <T>(url: string, value: T): T => {
   const valueToCache = typeof value === 'string' ? value : JSON.stringify(value);
+  console.log(`CACHING ${valueToCache} in localStorage`);
   localStorage.setItem(url, valueToCache);
   return value;
 };
@@ -48,7 +49,7 @@ export const syncToLocalStorage = <T>(url: string, value: Opt<T>): Opt<T> => {
  * @param url The URL for the stored value.  Can be any string but should
  * *uniquely* represent the resource.
  */
-export const useLocalState = <T>(url: string, initialState: Opt<T>): [Opt<T>, (x: Opt<T>) => void] => {
+export const useLocalState = <T>(url: string, initialState: T): [T, (x: T) => void] => {
   return useSyncedState<T>({
     initialState,
     url,

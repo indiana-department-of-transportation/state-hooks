@@ -11,7 +11,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 // import { Nullable } from '@jasmith79/ts-utils';
-import { Opt } from './t';
+// import { Opt } from './t';
 
 /**
  * @interface IStoreStateFn
@@ -21,7 +21,7 @@ import { Opt } from './t';
  * setters.
  */
 export interface IStoreStateFn<T> {
-  (url: string, value: Opt<T>): Opt<T> | Promise<Opt<T>>
+  (url: string, value: T): T | Promise<T>
 }
 
 /**
@@ -30,7 +30,7 @@ export interface IStoreStateFn<T> {
  * Getter for a stored state.
  */
 export interface IGetStoredStateFn<T> {
-  (url: string): Opt<T> | Promise<Opt<T>>
+  (url: string): T | Promise<T>
 }
 
 /**
@@ -39,7 +39,7 @@ export interface IGetStoredStateFn<T> {
  * Arguments for the main hook useSyncedState.
  */
 interface IUseSyncedStateArgs<T> {
-  initialState: Opt<T>,
+  initialState: T,
   url: string,
   getFromStore: IGetStoredStateFn<T>,
   syncToStore: IStoreStateFn<T>,
@@ -66,12 +66,12 @@ export const useSyncedState = <T>({
   getFromStore,
   syncToStore,
   onError = console.error,
-}: IUseSyncedStateArgs<T>): [Opt<T>, (x: Opt<T>) => void] => {
+}: IUseSyncedStateArgs<T>): [T, (x: T) => void] => {
   console.log('CALLED WITH');
   console.log(initialState);
   const shouldSet = useRef(false);
   const [state, updateState] = useState(initialState);
-  const setState = (state: Opt<T>) => {
+  const setState = (state: T) => {
     console.log('setting state');
     console.log(state);
     shouldSet.current = true;
@@ -80,18 +80,23 @@ export const useSyncedState = <T>({
 
   useEffect(() => {
     const fn = async () => {
+      console.log('ONLY ONCE!!!!!!!!!!!!!!!!!!!!!!!!!');
       let cachedValue;
       try {
+        console.log('abra');
         cachedValue = await getFromStore(url);
+        console.log('cadabra');
       } catch (err) {
         onError(err);
         return;
       }
 
       if (cachedValue != null) {
+        console.log('setting from localStorage');
         updateState(cachedValue);
       } else {
         try {
+          console.log('NO!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
           syncToStore(url, state);
         } catch (err) {
           onError(err);
@@ -111,6 +116,8 @@ export const useSyncedState = <T>({
       // sync calls made from outside the hook, hence the flag that
       // the setter toggles.
       if (shouldSet.current) {
+        console.log('syncing');
+        console.log(state);
         shouldSet.current = false;
         try {
           await syncToStore(url, state);

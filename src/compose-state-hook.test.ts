@@ -37,7 +37,7 @@ beforeEach(() => {
 });
 
 describe('useComposedState', () => {
-  xit('should compose two state hooks', async () => {
+  it('should compose two state hooks', async () => {
     const init = { hi: 5 };
     const ls = localStorageMockFactory();
     ls.getItem.mockReturnValueOnce({ hi: 4 });
@@ -65,7 +65,7 @@ describe('useComposedState', () => {
     expect(ls.setItem).toHaveBeenLastCalledWith('/foo/bar', JSON.stringify({ hi: 3 }));
   });
 
-  xit('should work with cursor-ified state hooks', async () => {
+  it('should work with cursor-ified state hooks', async () => {
     const url = '/foo/bar';
     const hooky = () => {
       const [state, setState] = useState({
@@ -86,22 +86,23 @@ describe('useComposedState', () => {
 
     const ls = localStorageMockFactory();
     globalThis.localStorage = ls;
+    ls.getItem.mockReturnValueOnce(null);
 
     const { result, waitForNextUpdate } = renderHook(hooky);
     expect(result.current.state.hi).toBe(5);
     expect(result.current.hi).toBe(5);
     expect(result.current.alsoHi).toBe(5);
+    await new Promise(res => setTimeout(res, 0));
 
     act(() => {
       result.current.setter(4);
     });
 
-    // await waitForNextUpdate();
     await new Promise(res => setTimeout(res, 0));
     console.log(JSON.stringify(result.current.state));
     expect(result.current.state.hi).toBe(4);
     expect(result.current.hi).toBe(4);
     expect(result.current.alsoHi).toBe(4);
-    expect(ls.setItem).toHaveBeenLastCalledWith('4');
+    expect(ls.setItem).toHaveBeenLastCalledWith(url, '4');
   });
 });
