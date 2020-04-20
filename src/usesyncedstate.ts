@@ -66,10 +66,10 @@ export const useSyncedState = <T>({
   getFromStore,
   syncToStore,
   onError = console.error,
-}: IUseSyncedStateArgs<T>): [T, (x: T) => void] => {
+}: IUseSyncedStateArgs<T>): [T, (x: T | ((x: T) => T)) => void] => {
   const shouldSet = useRef(false);
   const [state, updateState] = useState(initialState);
-  const setState = (state: T) => {
+  const setState = (state: T | ((x: T) => T)) => {
     shouldSet.current = true;
     updateState(state);
   };
