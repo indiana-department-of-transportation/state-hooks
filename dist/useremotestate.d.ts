@@ -1,3 +1,4 @@
+import { IUpdateStateFn } from './usesyncedstate';
 /**
  * @interface ISetRemoteArgs
  *
@@ -58,5 +59,5 @@ export declare const getServerState: <T>({ url, headers, }: IGetRemoteArgs) => P
  * @param args.onError The optional error handler, defaults to console.error.
  * @returns A tuple with the current state and a setter.
  */
-export declare const useRemoteState: <T>({ url, initialState, headers, onError, }: IUseRemoteArgs<T>) => [T, (x: T) => void];
+export declare const useRemoteState: <T>({ url, initialState, headers, onError, }: IUseRemoteArgs<T>) => [T, IUpdateStateFn<T>];
 export default useRemoteState;

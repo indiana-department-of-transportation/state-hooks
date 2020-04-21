@@ -7,7 +7,7 @@
  * @license MIT
  * @copyright INDOT, 2020
  */
-import { useSyncedState } from './usesyncedstate';
+import { useSyncedState, IUpdateStateFn } from './usesyncedstate';
 
 /**
  * @description getLocal
@@ -55,7 +55,7 @@ export const syncToLocalStorage = <T>(url: string, value: T): T => {
  * @param url The URL for the stored value.  Can be any string but should
  * *uniquely* represent the resource.
  */
-export const useLocalState = <T>(url: string, initialState: T): [T, (x: T) => void] => {
+export const useLocalState = <T>(url: string, initialState: T): [T, IUpdateStateFn<T>] => {
   return useSyncedState<T>({
     initialState,
     url,

@@ -36,8 +36,8 @@ describe('testing', () => {
       setHi(4);
     });
 
-    await new Promise(res => setTimeout(res, 0));
-    expect(result1.current[0]).toEqual({ hi: 4 });
+    await new Promise(res => setTimeout(res, 10));
     expect(result3.current[0]).toBe(4);
+    expect(result1.current[0]).toEqual({ hi: 4 });
   });
 });

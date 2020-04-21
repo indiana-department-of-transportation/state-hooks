@@ -13,6 +13,11 @@
  */
 import { useEffect, useState, useRef } from 'react';
 
+export interface IUpdateStateFn<T> {
+  (x: T): void;
+  (x: ((y: T) => T)): void;
+}
+
 /**
  * @interface IStoreStateFn
  *
@@ -66,10 +71,10 @@ export const useSyncedState = <T>({
   getFromStore,
   syncToStore,
   onError = console.error,
-}: IUseSyncedStateArgs<T>): [T, (x: T | ((x: T) => T)) => void] => {
+}: IUseSyncedStateArgs<T>): [T, IUpdateStateFn<T>] => {
   const shouldSet = useRef(false);
   const [state, updateState] = useState(initialState);
-  const setState = (state: T | ((x: T) => T)) => {
+  const setState: IUpdateStateFn<T> = (state: any) => {
     shouldSet.current = true;
     updateState(state);
   };

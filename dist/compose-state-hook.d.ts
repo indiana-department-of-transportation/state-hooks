@@ -1,4 +1,5 @@
-declare type HookReturn<T> = [T, (state: T) => void];
+import { IUpdateStateFn } from './usesyncedstate';
+declare type HookReturn<T> = [T, IUpdateStateFn<T>];
 declare type StateHook<T> = {
     (): HookReturn<T>;
 };
@@ -38,5 +39,5 @@ declare type StateHook<T> = {
  * @param hook2 The second state hook to compose.
  * @returns A state hook with a setter that updates both the composed hooks.
  */
-export declare const useComposedStateHook: <T>(hook1: StateHook<T>, hook2: StateHook<T>) => () => [T, (state: T) => void];
+export declare const useComposedStateHook: <T>(hook1: StateHook<T>, hook2: StateHook<T>) => () => [T, IUpdateStateFn<T>];
 export default useComposedStateHook;

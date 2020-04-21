@@ -52,21 +52,36 @@ exports.useComposedStateHook = (hook1, hook2) => {
         const [data2, set2] = hook2();
         const value = react_1.useRef(data2);
         const lastSet = react_1.useRef(data2);
+        const setOnNextRender = react_1.useRef(false);
+        // For an setState function argument we can't access the new 
+        // state directly, so we need to grab it on next render.
+        if (setOnNextRender.current) {
+            setOnNextRender.current = false;
+            lastSet.current = data2;
+            value.current = data2;
+        }
         const setter = react_1.useCallback((state) => {
-            let newState;
-            if (typeof value.current === 'object'
-                && typeof state === 'object'
-                && value.current !== null
-                && state !== null) {
-                newState = { ...value.current, ...state };
+            if (typeof state === 'function') {
+                setOnNextRender.current = true;
+                set1(state);
+                set2(state);
             }
             else {
-                newState = state;
+                let newState;
+                if (typeof value.current === 'object'
+                    && typeof state === 'object'
+                    && value.current !== null
+                    && state !== null) {
+                    newState = { ...value.current, ...state };
+                }
+                else {
+                    newState = state;
+                }
+                set1(newState);
+                set2(newState);
+                lastSet.current = newState;
+                value.current = newState;
             }
-            set1(newState);
-            set2(newState);
-            lastSet.current = newState;
-            value.current = newState;
         }, []);
         const stringLast = JSON.stringify(lastSet.current);
         const string1 = JSON.stringify(data1);

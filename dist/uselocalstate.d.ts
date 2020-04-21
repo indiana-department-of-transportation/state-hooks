@@ -1,4 +1,14 @@
 /**
+ * uselocalstate.js
+ *
+ * @description State hook that caches in localStorage.
+ *
+ * @author jarsmith@indot.in.gov
+ * @license MIT
+ * @copyright INDOT, 2020
+ */
+import { IUpdateStateFn } from './usesyncedstate';
+/**
  * @description getLocal
  *
  * Gets a cached value from localStorage.
@@ -29,5 +39,5 @@ export declare const syncToLocalStorage: <T>(url: string, value: T) => T;
  * @param url The URL for the stored value.  Can be any string but should
  * *uniquely* represent the resource.
  */
-export declare const useLocalState: <T>(url: string, initialState: T) => [T, (x: T) => void];
+export declare const useLocalState: <T>(url: string, initialState: T) => [T, IUpdateStateFn<T>];
 export default useLocalState;

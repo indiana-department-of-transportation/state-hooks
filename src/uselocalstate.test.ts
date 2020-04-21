@@ -36,4 +36,19 @@ describe('useLocalState', () => {
     expect(globalThis.localStorage.setItem)
       .toHaveBeenCalledWith('/foo/bar', JSON.stringify({ hi: 4 }));
   });
+
+  it('should work with an update function', async () => {
+    const init = false;
+    const { result } = renderHook(() => useLocalState('/foo/bar', init));
+    expect(globalThis.localStorage.getItem).toHaveBeenCalledWith('/foo/bar');
+    const [state, updateState] = result.current;
+    expect(state).toEqual(init);
+    act(() => {
+      updateState((prev: boolean) => !prev);
+    });
+
+    expect(result.current[0]).toBe(true);
+    expect(globalThis.localStorage.setItem)
+      .toHaveBeenCalledWith('/foo/bar', 'true');
+  });
 });

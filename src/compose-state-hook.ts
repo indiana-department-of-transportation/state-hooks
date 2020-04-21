@@ -8,8 +8,9 @@
  * @copyright INDOT, 2020
  */
 import { useCallback, useRef } from 'react';
+import { IUpdateStateFn } from './usesyncedstate';
 
-type HookReturn<T> = [T, (state: T) => void]
+type HookReturn<T> = [T, IUpdateStateFn<T>]
 type StateHook<T> = {
   (): HookReturn<T>
 }
@@ -53,28 +54,44 @@ type StateHook<T> = {
 export const useComposedStateHook = <T>(
   hook1: StateHook<T>,
   hook2: StateHook<T>
-): () => [T, (state: T) => void] => {
-  return (): [T, (state: T) => void] => {
+): () => [T, IUpdateStateFn<T>] => {
+  return (): [T, IUpdateStateFn<T>] => {
     const [data1, set1] = hook1();
     const [data2, set2] = hook2();
     const value = useRef(data2);
     const lastSet = useRef(data2);
-    const setter = useCallback((state: T) => {
-      let newState: T;
-      if (typeof value.current === 'object'
-        && typeof state === 'object'
-        && value.current !== null
-        && state !== null
-      ) {
-        newState = { ...value.current, ...state };
-      } else {
-        newState = state;
-      }
+    const setOnNextRender = useRef(false);
 
-      set1(newState);
-      set2(newState);
-      lastSet.current = newState;
-      value.current = newState;
+    // For an setState function argument we can't access the new 
+    // state directly, so we need to grab it on next render.
+    if (setOnNextRender.current) {
+      setOnNextRender.current = false;
+      lastSet.current = data2;
+      value.current = data2;
+    }
+
+    const setter: IUpdateStateFn<T> = useCallback((state: any) => {
+      if (typeof state === 'function') {
+        setOnNextRender.current = true;
+        set1(state);
+        set2(state);
+      } else {
+        let newState: T;
+        if (typeof value.current === 'object'
+          && typeof state === 'object'
+          && value.current !== null
+          && state !== null
+        ) {
+          newState = { ...value.current, ...state };
+        } else {
+          newState = state;
+        }
+
+        set1(newState);
+        set2(newState);
+        lastSet.current = newState;
+        value.current = newState;
+      }
     }, []);
 
     const stringLast = JSON.stringify(lastSet.current);
@@ -90,7 +107,7 @@ export const useComposedStateHook = <T>(
       }
     }
 
-    const result: [T, (state: T) => void] = [value.current, setter];
+    const result: [T, IUpdateStateFn<T>] = [value.current, setter];
     return result;
   };
 };

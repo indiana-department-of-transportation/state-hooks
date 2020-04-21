@@ -22,12 +22,20 @@ const ts_utils_1 = require("@jasmith79/ts-utils");
 exports.usePartialState = (state, setState) => {
     const useCursor = (key) => {
         const [cursorState, updateCursor] = react_1.useState(state[key]);
-        react_1.useMemo(() => {
-            const value = { [key]: cursorState };
-            const clone = ts_utils_1.deepClone(state);
-            setState(Object.assign(clone, value));
-        }, [cursorState]);
-        return [cursorState, updateCursor];
+        const shouldUpdate = react_1.useRef(false);
+        const update = (state) => {
+            shouldUpdate.current = true;
+            updateCursor(state);
+        };
+        react_1.useEffect(() => {
+            if (shouldUpdate.current) {
+                shouldUpdate.current = false;
+                const value = { [key]: cursorState };
+                const clone = ts_utils_1.deepClone(state);
+                setState(Object.assign(clone, value));
+            }
+        });
+        return [cursorState, update];
     };
     return useCursor;
 };

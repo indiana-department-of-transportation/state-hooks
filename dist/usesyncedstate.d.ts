@@ -1,3 +1,7 @@
+export interface IUpdateStateFn<T> {
+    (x: T): void;
+    (x: ((y: T) => T)): void;
+}
 /**
  * @interface IStoreStateFn
  *
@@ -42,5 +46,5 @@ interface IUseSyncedStateArgs<T> {
  * @param args.syncToStore Function to save state changes to the data store.
  * @returns A tuple with the current state and a setter.
  */
-export declare const useSyncedState: <T>({ initialState, url, getFromStore, syncToStore, onError, }: IUseSyncedStateArgs<T>) => [T, (x: T) => void];
+export declare const useSyncedState: <T>({ initialState, url, getFromStore, syncToStore, onError, }: IUseSyncedStateArgs<T>) => [T, IUpdateStateFn<T>];
 export default useSyncedState;

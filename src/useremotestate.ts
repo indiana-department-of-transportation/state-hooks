@@ -12,6 +12,7 @@ import { useCallback } from 'react';
 import {
   useSyncedState,
   IGetStoredStateFn,
+  IUpdateStateFn,
 } from './usesyncedstate';
 
 /**
@@ -139,7 +140,7 @@ export const useRemoteState = <T>({
   initialState,
   headers,
   onError,
-}: IUseRemoteArgs<T>): [T, (x: T) => void] => {
+}: IUseRemoteArgs<T>): [T, IUpdateStateFn<T>] => {
   const getRemote: IGetStoredStateFn<T> = useCallback(async (url: string): Promise<T> => {
     const params: {
       method: 'GET',

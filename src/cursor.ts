@@ -7,8 +7,9 @@
  * @license MIT
  * @copyright INDOT, 2020
  */
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { deepClone } from '@jasmith79/ts-utils';
+import { IUpdateStateFn } from './usesyncedstate';
 
 /**
  * @description Hook factory for producing cursors over a nested state.
@@ -18,16 +19,30 @@ import { deepClone } from '@jasmith79/ts-utils';
  * the state hooks in this repo.
  * @returns A hook to create a cursor over a key of the nested state.
  */
-export const usePartialState = <T, K extends keyof T>(state: T, setState: (update: T) => void) => {
-  const useCursor = <K extends keyof T>(key: K): [T[K], (update: T[K]) => void] => {
+export const usePartialState = <T, K extends keyof T>(
+  state: T,
+  setState: IUpdateStateFn<T>,
+) => {
+  const useCursor = <K extends keyof T>(
+    key: K,
+  ): [T[K], IUpdateStateFn<T[K]>] => {
     const [cursorState, updateCursor] = useState(state[key]);
-    useMemo(() => {
-      const value = { [key]: cursorState };
-      const clone = deepClone(state);
-      setState(Object.assign(clone, value));
-    }, [cursorState]);
+    const shouldUpdate = useRef(false);
+    const update: IUpdateStateFn<T[K]> = (state: any) => {
+      shouldUpdate.current = true;
+      updateCursor(state);
+    };
 
-    return [cursorState, updateCursor];
+    useEffect(() => {
+      if (shouldUpdate.current) {
+        shouldUpdate.current = false;
+        const value = { [key]: cursorState };
+        const clone = deepClone(state);
+        setState(Object.assign(clone, value));
+      }
+    });
+
+    return [cursorState, update];
   };
 
   return useCursor;

@@ -63,6 +63,16 @@ describe('useComposedState', () => {
     await waitForNextUpdate();
     expect(result.current[0]).toEqual({ hi: 3 });
     expect(ls.setItem).toHaveBeenLastCalledWith('/foo/bar', JSON.stringify({ hi: 3 }));
+
+    act(() => {
+      result.current[1]((prev) => {
+        return { hi: 2 };
+      });
+    });
+
+    await waitForNextUpdate();
+    expect(result.current[0]).toEqual({ hi: 2 });
+    expect(ls.setItem).toHaveBeenLastCalledWith('/foo/bar', JSON.stringify({ hi: 2 }));
   });
 
   it('should work with cursor-ified state hooks', async () => {
