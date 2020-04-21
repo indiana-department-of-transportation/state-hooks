@@ -1,10 +1,6 @@
 {
   "name": "@indot/state-hooks",
-<<<<<<< HEAD
   "version": "0.2.0",
-=======
-  "version": "0.1.2",
->>>>>>> 7894ab6820b31d8e3f50fb2a81eee668efc9d954
   "description": "Custom React hook to sync data to/from a data store. Supports both sync and async storage.",
   "main": "dist/index.js",
   "scripts": {
