@@ -5,13 +5,10 @@ import useLocalState from './uselocalstate';
 import useRemoteState from './useremotestate';
 import useComposedState from './compose-state-hook';
 import usePartialState from './cursor';
-import useCompose from './compose-state-hook';
 
-const { Request, Headers } = fetchPonyfill();
+const { Request } = fetchPonyfill();
 
 const localStorageMockFactory = () => {
-  const store: { [key: string]: string } = {};
-
   return {
     getItem: jest.fn(),
     setItem: jest.fn(),
@@ -70,7 +67,7 @@ describe('useComposedState', () => {
       });
     });
 
-    await waitForNextUpdate();
+    await new Promise(res => setTimeout(res, 0));
     expect(result.current[0]).toEqual({ hi: 2 });
     expect(ls.setItem).toHaveBeenLastCalledWith('/foo/bar', JSON.stringify({ hi: 2 }));
   });
