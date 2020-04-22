@@ -31,6 +31,7 @@ interface IUseSyncedStateArgs<T> {
     getFromStore: IGetStoredStateFn<T>;
     syncToStore: IStoreStateFn<T>;
     onError?: (err: Error) => void;
+    registry?: Set<string>;
 }
 /**
  * @description useSyncedState
@@ -46,5 +47,5 @@ interface IUseSyncedStateArgs<T> {
  * @param args.syncToStore Function to save state changes to the data store.
  * @returns A tuple with the current state and a setter.
  */
-export declare const useSyncedState: <T>({ initialState, url, getFromStore, syncToStore, onError, }: IUseSyncedStateArgs<T>) => [T, IUpdateStateFn<T>];
+export declare const useSyncedState: <T>({ initialState, url, getFromStore, syncToStore, onError, registry, }: IUseSyncedStateArgs<T>) => [T, IUpdateStateFn<T>];
 export default useSyncedState;

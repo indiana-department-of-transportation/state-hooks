@@ -58,13 +58,13 @@ describe('useRemoteState', () => {
 
     const { waitForNextUpdate } = renderHook(() => useRemoteState({
       initialState: { hi: 5 },
-      url: '/foo/bar',
+      url: '/bar/foo',
       headers,
     }));
 
-    await waitForNextUpdate();
+    await new Promise(res => setTimeout(res, 0));
     expect(globalThis.fetch).toHaveBeenCalledWith(
-      '/foo/bar',
+      '/bar/foo',
       {
         method: 'GET',
         headers,
@@ -80,7 +80,7 @@ describe('useRemoteState', () => {
 
     renderHook(() => useRemoteState({
       initialState: { hi: 5 },
-      url: '/foo/bar',
+      url: '/baz',
       onError,
     }));
 
@@ -95,7 +95,7 @@ describe('useRemoteState', () => {
 
     const { result, waitForNextUpdate } = renderHook(() => useRemoteState({
       initialState: { hi: 5 },
-      url: '/foo/bar',
+      url: '/qux',
       onError,
     }));
 
@@ -104,7 +104,7 @@ describe('useRemoteState', () => {
     });
 
     await waitForNextUpdate();
-    expect(onError).toHaveBeenCalledWith(new Error('POST for \'/foo/bar\' returned a 500 response.'));
+    expect(onError).toHaveBeenCalledWith(new Error('POST for \'/qux\' returned a 500 response.'));
   });
 
   it('should call errorHandler on a GET response not in range 200-399', async () => {
@@ -113,11 +113,11 @@ describe('useRemoteState', () => {
 
     renderHook(() => useRemoteState({
       initialState: { hi: 5 },
-      url: '/foo/bar',
+      url: '/fii',
       onError,
     }));
 
     await new Promise(res => setTimeout(res, 0));
-    expect(onError).toHaveBeenCalledWith(new Error('GET for \'/foo/bar\' returned a 500 response.'));
+    expect(onError).toHaveBeenCalledWith(new Error('GET for \'/fii\' returned a 500 response.'));
   });
 });

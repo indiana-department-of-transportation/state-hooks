@@ -14,6 +14,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * @copyright INDOT, 2020
  */
 const react_1 = require("react");
+// Ensure we don't get from the store more than once for a given URL,
+// i.e. only the very first time the hook is rendered.
+const REGISTRY = new Set();
 /**
  * @description useSyncedState
  *
@@ -28,7 +31,7 @@ const react_1 = require("react");
  * @param args.syncToStore Function to save state changes to the data store.
  * @returns A tuple with the current state and a setter.
  */
-exports.useSyncedState = ({ initialState, url, getFromStore, syncToStore, onError = console.error, }) => {
+exports.useSyncedState = ({ initialState, url, getFromStore, syncToStore, onError = console.error, registry = REGISTRY, }) => {
     const shouldSet = react_1.useRef(false);
     const [state, updateState] = react_1.useState(initialState);
     const setState = (state) => {
@@ -57,7 +60,10 @@ exports.useSyncedState = ({ initialState, url, getFromStore, syncToStore, onErro
                 }
             }
         };
-        fn();
+        if (!registry.has(url)) {
+            registry.add(url);
+            fn();
+        }
     }, []);
     react_1.useEffect(() => {
         const fn = async () => {

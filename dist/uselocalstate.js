@@ -1,4 +1,7 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * uselocalstate.js
@@ -9,7 +12,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * @license MIT
  * @copyright INDOT, 2020
  */
-const usesyncedstate_1 = require("./usesyncedstate");
+const usesyncedstate_1 = __importDefault(require("./usesyncedstate"));
+const REGISTRY = new Set();
 /**
  * @description getLocal
  *
@@ -55,11 +59,12 @@ exports.syncToLocalStorage = (url, value) => {
  * *uniquely* represent the resource.
  */
 exports.useLocalState = (url, initialState) => {
-    return usesyncedstate_1.useSyncedState({
+    return usesyncedstate_1.default({
         initialState,
         url,
         getFromStore: exports.getFromLocalStorage,
         syncToStore: exports.syncToLocalStorage,
+        registry: REGISTRY,
     });
 };
 exports.default = exports.useLocalState;

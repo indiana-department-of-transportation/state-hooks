@@ -11,6 +11,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 const react_1 = require("react");
 const usesyncedstate_1 = require("./usesyncedstate");
+const REGISTRY = new Set();
 /**
  * @description POSTs state to a url.
  *
@@ -122,6 +123,7 @@ exports.useRemoteState = ({ url, initialState, headers, onError, }) => {
         getFromStore: getRemote,
         syncToStore: setRemote,
         onError,
+        registry: REGISTRY,
     });
 };
 exports.default = exports.useRemoteState;

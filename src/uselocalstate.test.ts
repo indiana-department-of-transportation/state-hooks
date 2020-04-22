@@ -39,8 +39,8 @@ describe('useLocalState', () => {
 
   it('should work with an update function', async () => {
     const init = false;
-    const { result } = renderHook(() => useLocalState('/foo/bar', init));
-    expect(globalThis.localStorage.getItem).toHaveBeenCalledWith('/foo/bar');
+    const { result } = renderHook(() => useLocalState('/bar/foo', init));
+    expect(globalThis.localStorage.getItem).toHaveBeenCalledWith('/bar/foo');
     const [state, updateState] = result.current;
     expect(state).toEqual(init);
     act(() => {
@@ -49,6 +49,13 @@ describe('useLocalState', () => {
 
     expect(result.current[0]).toBe(true);
     expect(globalThis.localStorage.setItem)
-      .toHaveBeenCalledWith('/foo/bar', 'true');
+      .toHaveBeenCalledWith('/bar/foo', 'true');
+  });
+
+  it('should only get from localStorage on the very first use', async () => {
+    const init = { hi: 5 };
+    const { result } = renderHook(() => useLocalState('/baz', init));
+    const { result: result2 } = renderHook(() => useLocalState('/baz', init));
+    expect(globalThis.localStorage.getItem).toHaveBeenCalledTimes(1);
   });
 });

@@ -49,7 +49,12 @@ interface IUseSyncedStateArgs<T> {
   getFromStore: IGetStoredStateFn<T>,
   syncToStore: IStoreStateFn<T>,
   onError?: (err: Error) => void,
+  registry?: Set<string>,
 }
+
+// Ensure we don't get from the store more than once for a given URL,
+// i.e. only the very first time the hook is rendered.
+const REGISTRY = new Set<string>();
 
 /**
  * @description useSyncedState
@@ -71,6 +76,7 @@ export const useSyncedState = <T>({
   getFromStore,
   syncToStore,
   onError = console.error,
+  registry = REGISTRY,
 }: IUseSyncedStateArgs<T>): [T, IUpdateStateFn<T>] => {
   const shouldSet = useRef(false);
   const [state, updateState] = useState(initialState);
@@ -100,7 +106,10 @@ export const useSyncedState = <T>({
       }
     };
 
-    fn();
+    if (!registry.has(url)) {
+      registry.add(url);
+      fn();
+    }
   }, []);
 
   useEffect(() => {

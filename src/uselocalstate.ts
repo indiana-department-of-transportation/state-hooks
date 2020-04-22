@@ -7,7 +7,9 @@
  * @license MIT
  * @copyright INDOT, 2020
  */
-import { useSyncedState, IUpdateStateFn } from './usesyncedstate';
+import useSyncedState, { IUpdateStateFn } from './usesyncedstate';
+
+const REGISTRY = new Set<string>();
 
 /**
  * @description getLocal
@@ -61,6 +63,7 @@ export const useLocalState = <T>(url: string, initialState: T): [T, IUpdateState
     url,
     getFromStore: getFromLocalStorage,
     syncToStore: syncToLocalStorage,
+    registry: REGISTRY,
   });
 };
 

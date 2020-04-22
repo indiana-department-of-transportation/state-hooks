@@ -15,6 +15,8 @@ import {
   IUpdateStateFn,
 } from './usesyncedstate';
 
+const REGISTRY = new Set<string>();
+
 /**
  * @interface ISetRemoteArgs
  * 
@@ -202,6 +204,7 @@ export const useRemoteState = <T>({
     getFromStore: getRemote,
     syncToStore: setRemote,
     onError,
+    registry: REGISTRY,
   });
 };
 
